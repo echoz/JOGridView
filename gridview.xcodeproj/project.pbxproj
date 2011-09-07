@@ -16,6 +16,7 @@
 		3FBB3E671417055F00588168 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB3E651417055F00588168 /* MainWindow.xib */; };
 		3FBB3E6F1417058700588168 /* JOGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E6E1417058700588168 /* JOGridView.m */; };
 		3FBB3E72141715DB00588168 /* JOGridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E71141715DB00588168 /* JOGridViewController.m */; };
+		3FBB3E7514172B0100588168 /* JOGridViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E7414172B0100588168 /* JOGridViewCell.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,8 @@
 		3FBB3E6E1417058700588168 /* JOGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOGridView.m; sourceTree = "<group>"; };
 		3FBB3E70141715DB00588168 /* JOGridViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOGridViewController.h; sourceTree = "<group>"; };
 		3FBB3E71141715DB00588168 /* JOGridViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOGridViewController.m; sourceTree = "<group>"; };
+		3FBB3E7314172B0100588168 /* JOGridViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOGridViewCell.h; sourceTree = "<group>"; };
+		3FBB3E7414172B0100588168 /* JOGridViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOGridViewCell.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -53,6 +56,8 @@
 		3FBB3E441417055F00588168 = {
 			isa = PBXGroup;
 			children = (
+				3FBB3E7314172B0100588168 /* JOGridViewCell.h */,
+				3FBB3E7414172B0100588168 /* JOGridViewCell.m */,
 				3FBB3E70141715DB00588168 /* JOGridViewController.h */,
 				3FBB3E71141715DB00588168 /* JOGridViewController.m */,
 				3FBB3E6D1417058700588168 /* JOGridView.h */,
@@ -166,6 +171,7 @@
 				3FBB3E641417055F00588168 /* gridviewAppDelegate.m in Sources */,
 				3FBB3E6F1417058700588168 /* JOGridView.m in Sources */,
 				3FBB3E72141715DB00588168 /* JOGridViewController.m in Sources */,
+				3FBB3E7514172B0100588168 /* JOGridViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

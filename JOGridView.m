@@ -11,11 +11,12 @@
 #define JOGRIDVIEW_DEFAULT_ROW_HEIGHT 44.0
 
 @interface JOGridView (PrivateMethods)
--(void)enqueueReusableView:(UIView *)view withIdentifier:(NSString *)identifier;
+-(void)enqueueReusableCell:(JOGridViewCell *)cell withIdentifier:(NSString *)identifier;
 @end
 
 @implementation JOGridView
 @synthesize datasource = gridViewDataSource;
+@synthesize cellSpacing = __cellSpacing;
 
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
@@ -49,7 +50,7 @@
 }
 
 #pragma mark -
-#pragma mark View
+#pragma mark Views
 
 -(void)layoutSubviews {
 	// layout subviews
@@ -59,6 +60,10 @@
 	if (scrollView == self) {
 		// do tracking of which rows are in view
 	}
+}
+
+-(NSRange)visibleRows {
+	return NSMakeRange(0, 0);
 }
 
 #pragma mark -
@@ -73,9 +78,9 @@
 	// gather total height
 	CGFloat totalHeight = 0.0;
 	
-	if ([gridViewDataSource respondsToSelector:@selector(gridView:heightForRow:)]) {
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
 		for (int i=0;i<__rows;i++) {
-			totalHeight += [gridViewDataSource gridView:self heightForRow:i];
+			totalHeight += [gridViewDelegate gridView:self heightForRow:i];
 		}				
 	} else {
 		totalHeight = __rows * JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
@@ -88,13 +93,13 @@
 #pragma mark -
 #pragma mark Reusable Views
 
--(UIView *)dequeueReusableViewWithIdenitifer:(NSString *)identifier {
+-(UIView *)dequeueReusableCellWithIdenitifer:(NSString *)identifier {
 
 	NSMutableArray *stack = [__reusableViews objectForKey:identifier];
 	
 	if ((stack) && ([stack count] > 0)) {
 		
-		UIView *view = [stack objectAtIndex:0];
+		JOGridViewCell *view = [stack objectAtIndex:0];
 		[stack removeObjectAtIndex:0];
 		
 		return view;
@@ -103,12 +108,12 @@
 	}
 }
 
--(void)enqueueReusableView:(UIView *)view withIdentifier:(NSString *)identifier {
+-(void)enqueueReusableCell:(JOGridViewCell *)cell withIdentifier:(NSString *)identifier {
 	if ([__reusableViews objectForKey:identifier]) {
-		[[__reusableViews objectForKey:identifier] addObject:view];
+		[[__reusableViews objectForKey:identifier] addObject:cell];
 	} else {
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity:0];
-		[array addObject:view];
+		[array addObject:cell];
 		[__reusableViews setObject:array forKey:identifier];
 	}
 }

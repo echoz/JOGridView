@@ -7,26 +7,31 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JOGridViewCell.h"
 
 @class JOGridView;
 
 @protocol JOGridViewDelegate <NSObject, UIScrollViewDelegate>
 @optional
 -(void)willDisplayView:(UIView *)view forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
+-(BOOL)gridView:(JOGridView *)gridview shouldFillColumnsAtRow:(NSUInteger)row;
+-(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
 @end
 
 @protocol JOGridViewDataSource <NSObject>
 @optional
--(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
+-(NSUInteger)columnsForGridView:(JOGridView *)gridView atRow:(NSUInteger)row;
+
 @required
 -(NSUInteger)rowsForGridView:(JOGridView *)gridView;
--(NSUInteger)columnsForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
--(UIView *)viewForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
+-(NSUInteger)maxColumnsForGridView:(JOGridView *)gridView;
+-(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
 	
 	NSUInteger __rows;
+	CGFloat __cellSpacing;
 	
 	NSMutableDictionary *__reusableViews;
 	
@@ -34,8 +39,9 @@
 	id <JOGridViewDataSource> gridViewDataSource;
 }
 @property (nonatomic, assign) id<JOGridViewDataSource> datasource;
+@property (nonatomic, assign) CGFloat cellSpacing;
 
--(UIView *)dequeueReusableViewWithIdenitifer:(NSString *)identifier;
+-(UIView *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;
 
 @end
