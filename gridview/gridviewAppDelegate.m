@@ -22,6 +22,7 @@
 	
 	gridview.delegate = self;
 	gridview.datasource = self;
+	[gridview reloadData];
 	
 	[gridview release];
 	
@@ -71,7 +72,7 @@
 #pragma mark JOGridView Stuff
 
 -(NSUInteger)rowsForGridView:(JOGridView *)gridView {
-	return 10;
+	return 20;
 }
 
 -(NSUInteger)columnsForGridView:(JOGridView *)gridView {

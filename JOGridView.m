@@ -28,7 +28,15 @@
 		__reusableViews = [[NSMutableDictionary alloc] initWithCapacity:0];
 		__rows = 0;
 		__previousOffset = 0.0;
-
+		self.alwaysBounceVertical = YES;
+		self.showsVerticalScrollIndicator = YES;
+		self.showsHorizontalScrollIndicator = NO;
+		
+		self.canCancelContentTouches = NO;
+		self.clipsToBounds = YES;
+		self.pagingEnabled = NO;
+		self.scrollEnabled = YES;	
+		
 		[super setDelegate:self];
 	}
 
@@ -103,15 +111,15 @@
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
 	
 	if (scrollView == self) {
-		BOOL scrollingDownwards = (__previousOffset < self.contentOffset.y) ? YES : NO;
+		BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 
 		if (scrollingDownwards) {
 			// scrolling down
-
+			NSLog(@"going down %f", self.contentOffset.y);
 			
 		} else {
 			// scrolling up
-
+			NSLog(@"going up  %f", self.contentOffset.y);
 			
 		}
 		__previousOffset = self.contentOffset.y;
