@@ -63,7 +63,56 @@
 }
 
 -(NSRange)visibleRows {
-	return NSMakeRange(0, 0);
+	
+	NSUInteger rows = 0;
+	NSUInteger startrow = 0;
+	CGFloat leadInHeight = 0.0;
+	
+	if (self.frame.size.height == 0.0) {
+		
+		// if the frame's height is zero means nothing is visible
+		startrow = 0;
+		rows = 0;
+		
+	} else {
+		
+		// find where the visible/semi visible row starts from
+		while (leadInHeight < self.contentOffset.y) {
+			if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+				leadInHeight += [gridViewDelegate gridView:self heightForRow:startrow];
+			} else {
+				leadInHeight += JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+			}
+			startrow++;
+		}
+		
+		// leadInHeight is the height of the completely non visible portion
+		// hence it wil always be one less row than the last row
+		if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+			leadInHeight -= [gridViewDelegate gridView:self heightForRow:startrow];
+		} else {
+			leadInHeight -= JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+		}
+		
+		// find the number of sequentially visible rows
+		CGFloat visibleAreaHeight = self.frame.size.height + self.contentOffset.y - leadInHeight;
+		CGFloat visibleRowsHeight = 0.0;
+		
+		rows = startrow;
+		
+		while (visibleRowsHeight < visibleAreaHeight) {
+			if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+				visibleRowsHeight += [gridViewDelegate gridView:self heightForRow:rows];
+			} else {
+				visibleRowsHeight += JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+			}
+			rows++;
+		}
+		
+		rows = (rows - startrow) + 1;
+	}
+	
+	return NSMakeRange(startrow, rows);
 }
 
 #pragma mark -
@@ -88,6 +137,7 @@
 	
 	self.contentSize = CGSizeMake(self.frame.size.width, totalHeight);
 	
+	[self setNeedsLayout];
 }
 
 #pragma mark -
