@@ -13,7 +13,7 @@
 
 @protocol JOGridViewDelegate <NSObject, UIScrollViewDelegate>
 @optional
--(void)willDisplayView:(UIView *)view forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
+-(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 -(BOOL)gridView:(JOGridView *)gridview shouldFillColumnsAtRow:(NSUInteger)row;
 -(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
 @end
@@ -30,9 +30,16 @@
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
 	
+	CGFloat __leadInHeight;
+	NSUInteger __firstVisibleRow;
+	CGFloat __firstVisibleRowHeight;
+	
+	CGFloat __previousOffset;
+	
 	NSUInteger __rows;
 	CGFloat __cellSpacing;
 	
+	NSMutableArray *__visibleRows;
 	NSMutableDictionary *__reusableViews;
 	
 	id <JOGridViewDelegate> gridViewDelegate;
