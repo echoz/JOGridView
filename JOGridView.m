@@ -14,6 +14,9 @@
 -(void)enqueueReusableCell:(JOGridViewCell *)cell;
 -(NSRange)rangeOfVisibleRows;
 -(void)setFirstVisibleRow:(NSUInteger)row;
+
+-(CGFloat)heightForRow:(NSUInteger)row;
+-(NSUInteger)rowForOffset:(CGFloat)offset;
 @end
 
 @implementation JOGridView
@@ -24,9 +27,6 @@
 	if ((self = [super initWithFrame:frame])) {
 		__reusableViews = [[NSMutableDictionary alloc] initWithCapacity:0];
 		__rows = 0;
-		__firstVisibleRow = 0;
-		__firstVisibleRowHeight = 0.0;
-		__leadInHeight = 0.0;
 		__previousOffset = 0.0;
 		
 		[super setDelegate:self];
@@ -55,16 +55,6 @@
 	return gridViewDelegate;
 }
 
--(void)setFirstVisibleRow:(NSUInteger)row {
-	__firstVisibleRow = row;
-
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-		__firstVisibleRowHeight = [gridViewDelegate gridView:self heightForRow:row];
-	} else {
-		__firstVisibleRowHeight = JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-	}
-}
-
 #pragma mark -
 #pragma mark Views
 
@@ -74,12 +64,6 @@
 }
 
 -(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp {
-	BOOL shouldFillRow = NO;
-	
-	// enquire if we need to fill the row with whatever number of columns we have
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:shouldFillColumnsAtRow:)]) {
-		shouldFillRow = [gridViewDelegate gridView:self shouldFillColumnsAtRow:row];
-	}
 	
 	CGFloat rowHeight = 0.0;
 	
@@ -90,19 +74,8 @@
 		rowHeight = JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
 	}
 	
-	NSUInteger cols = 0;
-	NSUInteger maxcols = [gridViewDataSource maxColumnsForGridView:self];
-	NSUInteger widthModifier = maxcols;
-	
-	if ([gridViewDataSource respondsToSelector:@selector(columnsForGridView:atRow:)]) {
-		cols = [gridViewDataSource columnsForGridView:self atRow:row];
-		if (shouldFillRow) {
-			widthModifier = cols;
-		}
-	} else {
-		cols = maxcols;
-	}
-	
+	NSUInteger cols = [gridViewDataSource columnsForGridView:self];
+		
 	JOGridViewCell *cell = nil;
 	
 	NSMutableArray *rowOfCells = [NSMutableArray arrayWithCapacity:cols];
@@ -115,7 +88,7 @@
 
 		[self addSubview:cell];
 		
-		cell.frame = CGRectMake(i/widthModifier * self.frame.size.width, height - rowHeight, self.frame.size.width / widthModifier, rowHeight);
+		cell.frame = CGRectMake(i/cols * self.frame.size.width, height - rowHeight, self.frame.size.width / cols, rowHeight);
 		
 		[rowOfCells addObject:cell];
 	}
@@ -134,55 +107,11 @@
 
 		if (scrollingDownwards) {
 			// scrolling down
-			
-			// add new row!			
-			if ((__leadInHeight - self.contentOffset.y) <= 0) {
-				[self layoutRow:(__firstVisibleRow-1) atHeight:self.contentOffset.y scrollingUp:NO];
-				[self setFirstVisibleRow:__firstVisibleRow-1];
-			}
-			
-			// enqueue if you must
-			
+
 			
 		} else {
 			// scrolling up
-			
-			// figure out number of visible rows (partial or not)
-			CGFloat visibleAreaHeight = self.frame.size.height + self.contentOffset.y - __leadInHeight;
-			CGFloat visibleRowsHeight = 0.0;
-			
-			NSUInteger row = __firstVisibleRow;
-			
-			// add new rows if there is a need
-			while (visibleRowsHeight < visibleAreaHeight) {
-				if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-					visibleRowsHeight += [gridViewDelegate gridView:self heightForRow:row];
-				} else {
-					visibleRowsHeight += JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-				}
-				row++;
-			}
-			
-			// returns total number of supposedly visible rows
-			NSUInteger rows = (row - __firstVisibleRow) + 1;
-			
-			// check if we need to warp in new rows
-			if ((rows > [__visibleRows count]) && (rows == __rows)) {
-				[self layoutRow:row atHeight:(visibleRowsHeight + self.contentOffset.y) scrollingUp:YES];
-			}
-	
-			// enqueue if you must
-			if ((__leadInHeight + __firstVisibleRowHeight) >= self.contentOffset.y) {
-				// enqueue!
-				NSArray *row = [__visibleRows objectAtIndex:0];
-				[__visibleRows removeObject:0];
-				
-				for (JOGridViewCell *cell in row) {
-					[self enqueueReusableCell:cell];
-				}
-				
-				[self setFirstVisibleRow:__firstVisibleRow+1];
-			}
+
 			
 		}
 	}
@@ -190,57 +119,41 @@
 	__previousOffset = self.contentOffset.y;
 }
 
--(NSRange)rangeOfVisibleRows {
+-(NSUInteger)rowForOffset:(CGFloat)offset {
 	
-	NSUInteger rows = 0;
-	__firstVisibleRow = 0;
-	__leadInHeight = 0.0;
-	
-	if (self.frame.size.height == 0.0) {
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+
+		CGFloat height = 0.0;
+		int i=0;
 		
-		// if the frame's height is zero means nothing is visible
-		__firstVisibleRow = 0;
-		rows = 0;
+		while (height < offset) {
+			height += [gridViewDelegate gridView:self heightForRow:i];			
+			i++;
+		}
+					
+		if (height >= offset) {
+			return i;
+		} else {
+			return 0;
+		}		
 		
 	} else {
-		
-		// find where the visible/semi visible row starts from
-		while (__leadInHeight < self.contentOffset.y) {
-			if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-				__leadInHeight += [gridViewDelegate gridView:self heightForRow:__firstVisibleRow];
-			} else {
-				__leadInHeight += JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-			}
-			[self setFirstVisibleRow:__firstVisibleRow+1];
-		}
-		
-		// leadInHeight is the height of the completely non visible portion
-		// hence it wil always be one less row than the last row
-		if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-			__leadInHeight -= [gridViewDelegate gridView:self heightForRow:__firstVisibleRow];
-		} else {
-			__leadInHeight -= JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-		}
-		
-		// find the number of sequentially visible rows
-		CGFloat visibleAreaHeight = self.frame.size.height + self.contentOffset.y - __leadInHeight;
-		CGFloat visibleRowsHeight = 0.0;
-		
-		rows = __firstVisibleRow;
-		
-		while (visibleRowsHeight < visibleAreaHeight) {
-			if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-				visibleRowsHeight += [gridViewDelegate gridView:self heightForRow:rows];
-			} else {
-				visibleRowsHeight += JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-			}
-			rows++;
-		}
-		
-		rows = (rows - __firstVisibleRow) + 1;
+		return (NSUInteger)(offset / JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
 	}
-	
-	return NSMakeRange(__firstVisibleRow, rows);
+}
+
+-(CGFloat)heightForRow:(NSUInteger)row {
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+		CGFloat height = 0.0;
+		
+		for (int i=0;i<row;i++) {
+			height += [gridViewDelegate gridView:self heightForRow:i];
+		}
+		
+		return height;
+	} else {
+		return (__rows * JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
+	}
 }
 
 #pragma mark -
