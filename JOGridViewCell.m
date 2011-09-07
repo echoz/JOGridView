@@ -9,6 +9,7 @@
 #import "JOGridViewCell.h"
 
 @implementation JOGridViewCell
+@synthesize reuseIdentifier = __reuseIdentifier;
 
 - (id)initWithFrame:(CGRect)frame
 {

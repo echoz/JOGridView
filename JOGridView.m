@@ -11,7 +11,7 @@
 #define JOGRIDVIEW_DEFAULT_ROW_HEIGHT 44.0
 
 @interface JOGridView (PrivateMethods)
--(void)enqueueReusableCell:(JOGridViewCell *)cell withIdentifier:(NSString *)identifier;
+-(void)enqueueReusableCell:(JOGridViewCell *)cell;
 @end
 
 @implementation JOGridView
@@ -108,13 +108,13 @@
 	}
 }
 
--(void)enqueueReusableCell:(JOGridViewCell *)cell withIdentifier:(NSString *)identifier {
-	if ([__reusableViews objectForKey:identifier]) {
-		[[__reusableViews objectForKey:identifier] addObject:cell];
+-(void)enqueueReusableCell:(JOGridViewCell *)cell {
+	if ([__reusableViews objectForKey:cell.reuseIdentifier]) {
+		[[__reusableViews objectForKey:cell.reuseIdentifier] addObject:cell];
 	} else {
 		NSMutableArray *array = [NSMutableArray arrayWithCapacity:0];
 		[array addObject:cell];
-		[__reusableViews setObject:array forKey:identifier];
+		[__reusableViews setObject:array forKey:cell.reuseIdentifier];
 	}
 }
 

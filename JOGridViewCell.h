@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface JOGridViewCell : UIView
+@interface JOGridViewCell : UIView {
+	NSString *__reuseIdentifier;
+}
+
+@property (nonatomic, copy) NSString *reuseIdentifier;
 
 @end
