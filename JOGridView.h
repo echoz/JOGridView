@@ -11,10 +11,13 @@
 @class JOGridView;
 
 @protocol JOGridViewDelegate <NSObject, UIScrollViewDelegate>
+@optional
 -(void)willDisplayView:(UIView *)view forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 @end
 
 @protocol JOGridViewDataSource <NSObject>
+@optional
+-(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
 @required
 -(NSUInteger)rowsForGridView:(JOGridView *)gridView;
 -(NSUInteger)columnsForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
@@ -22,13 +25,17 @@
 @end
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
+	
+	NSUInteger __rows;
+	
 	NSMutableDictionary *__reusableViews;
 	
-	id <JOGridViewDelegate> externalDelegate;
-	id <JOGridViewDataSource> datasource;
+	id <JOGridViewDelegate> gridViewDelegate;
+	id <JOGridViewDataSource> gridViewDataSource;
 }
 @property (nonatomic, assign) id<JOGridViewDataSource> datasource;
 
 -(UIView *)dequeueReusableViewWithIdenitifer:(NSString *)identifier;
+-(void)reloadData;
 
 @end
