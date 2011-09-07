@@ -14,6 +14,7 @@
 		3FBB3E601417055F00588168 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E5F1417055F00588168 /* main.m */; };
 		3FBB3E641417055F00588168 /* gridviewAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E631417055F00588168 /* gridviewAppDelegate.m */; };
 		3FBB3E671417055F00588168 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 3FBB3E651417055F00588168 /* MainWindow.xib */; };
+		3FBB3E6F1417058700588168 /* JOGridView.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FBB3E6E1417058700588168 /* JOGridView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,13 +22,15 @@
 		3FBB3E531417055F00588168 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3FBB3E551417055F00588168 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		3FBB3E571417055F00588168 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		3FBB3E5B1417055F00588168 /* gridview-Info.plist */ = {isa = PBXFileReference; path = "gridview-Info.plist"; sourceTree = "<group>"; };
+		3FBB3E5B1417055F00588168 /* gridview-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "gridview-Info.plist"; sourceTree = "<group>"; };
 		3FBB3E5D1417055F00588168 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		3FBB3E5F1417055F00588168 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3FBB3E611417055F00588168 /* gridview-Prefix.pch */ = {isa = PBXFileReference; path = "gridview-Prefix.pch"; sourceTree = "<group>"; };
-		3FBB3E621417055F00588168 /* gridviewAppDelegate.h */ = {isa = PBXFileReference; path = gridviewAppDelegate.h; sourceTree = "<group>"; };
+		3FBB3E611417055F00588168 /* gridview-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gridview-Prefix.pch"; sourceTree = "<group>"; };
+		3FBB3E621417055F00588168 /* gridviewAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gridviewAppDelegate.h; sourceTree = "<group>"; };
 		3FBB3E631417055F00588168 /* gridviewAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = gridviewAppDelegate.m; sourceTree = "<group>"; };
 		3FBB3E661417055F00588168 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		3FBB3E6D1417058700588168 /* JOGridView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JOGridView.h; sourceTree = "<group>"; };
+		3FBB3E6E1417058700588168 /* JOGridView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JOGridView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,6 +50,8 @@
 		3FBB3E441417055F00588168 = {
 			isa = PBXGroup;
 			children = (
+				3FBB3E6D1417058700588168 /* JOGridView.h */,
+				3FBB3E6E1417058700588168 /* JOGridView.m */,
 				3FBB3E591417055F00588168 /* gridview */,
 				3FBB3E521417055F00588168 /* Frameworks */,
 				3FBB3E501417055F00588168 /* Products */,
@@ -154,6 +159,7 @@
 			files = (
 				3FBB3E601417055F00588168 /* main.m in Sources */,
 				3FBB3E641417055F00588168 /* gridviewAppDelegate.m in Sources */,
+				3FBB3E6F1417058700588168 /* JOGridView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
