@@ -31,6 +31,8 @@
 	CGFloat __previousOffset;
 	
 	NSUInteger __rows;
+	NSUInteger __columns;
+	
 	CGFloat __cellSpacing;
 	
 	NSMutableArray *__visibleRows;
@@ -42,7 +44,7 @@
 @property (nonatomic, assign) id<JOGridViewDataSource> datasource;
 @property (nonatomic, assign) CGFloat cellSpacing;
 
--(UIView *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
+-(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;
 
 @end

@@ -28,7 +28,7 @@
 		__reusableViews = [[NSMutableDictionary alloc] initWithCapacity:0];
 		__rows = 0;
 		__previousOffset = 0.0;
-		
+
 		[super setDelegate:self];
 	}
 
@@ -51,7 +51,7 @@
 	[super setDelegate:self];
 }
 
--(id<JOGridViewDelegate, UIScrollViewDelegate>)delegate {
+-(id<JOGridViewDelegate>)delegate {
 	return gridViewDelegate;
 }
 
@@ -114,9 +114,9 @@
 
 			
 		}
+		__previousOffset = self.contentOffset.y;
 	}
 	
-	__previousOffset = self.contentOffset.y;
 }
 
 -(NSUInteger)rowForOffset:(CGFloat)offset {
@@ -161,24 +161,31 @@
 
 -(void)reloadData {
 
-	if ([gridViewDataSource respondsToSelector:@selector(rowsForGridView:)]) {
+	if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
+		
 		__rows = [gridViewDataSource rowsForGridView:self];
-	}
-	
-	// gather total height
-	CGFloat totalHeight = 0.0;
-	
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-		for (int i=0;i<__rows;i++) {
-			totalHeight += [gridViewDelegate gridView:self heightForRow:i];
-		}				
+		__columns = [gridViewDataSource columnsForGridView:self];
+		
+		// gather total height
+		CGFloat totalHeight = 0.0;
+		
+		if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+			for (int i=0;i<__rows;i++) {
+				totalHeight += [gridViewDelegate gridView:self heightForRow:i];
+			}				
+		} else {
+			totalHeight = __rows * JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+		}
+		
+		self.contentSize = CGSizeMake(self.frame.size.width, totalHeight);
+		
+		[self setNeedsLayout];
+		
 	} else {
-		totalHeight = __rows * JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+		NSLog(@"Y U NO CONFIRM TO PROPER REQUIRED PROTOCOL?");
+		
 	}
-	
-	self.contentSize = CGSizeMake(self.frame.size.width, totalHeight);
-	
-	[self setNeedsLayout];
+
 }
 
 #pragma mark -

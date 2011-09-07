@@ -16,6 +16,15 @@
 {
 	// Override point for customization after application launch.
 	[self.window makeKeyAndVisible];
+
+	JOGridView *gridview = [[JOGridView alloc] initWithFrame:CGRectMake(0, 0, self.window.frame.size.width, self.window.frame.size.height)];
+	[self.window addSubview:gridview];
+	
+	gridview.delegate = self;
+	gridview.datasource = self;
+	
+	[gridview release];
+	
     return YES;
 }
 
@@ -57,6 +66,33 @@
 	 See also applicationDidEnterBackground:.
 	 */
 }
+
+#pragma mark -
+#pragma mark JOGridView Stuff
+
+-(NSUInteger)rowsForGridView:(JOGridView *)gridView {
+	return 10;
+}
+
+-(NSUInteger)columnsForGridView:(JOGridView *)gridView {
+	return 3;
+}
+
+-(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
+	JOGridViewCell *cell = [gridView dequeueReusableCellWithIdenitifer:@"cell"];
+	
+	if (!cell) {
+		cell = [[JOGridViewCell alloc] init];
+		cell.reuseIdentifier = @"cell";
+	}
+	
+	return cell;
+}
+
+-(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
+	cell.backgroundColor = [UIColor greenColor];
+}
+
 
 - (void)dealloc
 {

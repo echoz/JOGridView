@@ -7,8 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "JOGridView.h"
 
-@interface gridviewAppDelegate : NSObject <UIApplicationDelegate>
+@interface gridviewAppDelegate : NSObject <UIApplicationDelegate, JOGridViewDataSource, JOGridViewDelegate>
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 
