@@ -30,13 +30,18 @@
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
 	
-	CGFloat __previousOffset;
+	NSUInteger		__firstWarpedInRow;
+	CGFloat			__firstWarpedInRowHeight;
+	NSUInteger		__lastWarpedInRow;
+	CGFloat			__lastWarpedInRowHeight;
 	
-	NSUInteger __rows;
-	NSUInteger __columns;
+	CGFloat			__previousOffset;
 	
-	NSMutableArray *__visibleRows;
-	NSCache *__reusableViews;
+	NSUInteger		__rows;
+	NSUInteger		__columns;
+	
+	NSMutableArray*	__visibleRows;
+	NSCache*		__reusableViews;
 	
 	id <JOGridViewDelegate> gridViewDelegate;
 	id <JOGridViewDataSource> gridViewDataSource;

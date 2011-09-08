@@ -244,7 +244,7 @@
 }
 
 #pragma mark -
-#pragma mark Delegate Methods
+#pragma mark Delegate/Datasource Methods
 
 -(CGFloat)delegateHeightForRow:(NSUInteger)row {
 	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
