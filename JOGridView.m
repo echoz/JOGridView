@@ -33,6 +33,13 @@
 		__reusableViews = [[NSMutableDictionary alloc] initWithCapacity:0];
 		__rows = 0;
 		__previousOffset = 0.0;
+		
+		__firstWarpedInRow = 0;
+		__firstWarpedInRowHeight = 0.0;
+		
+		__lastWarpedInRow = 0;
+		__lastWarpedInRowHeight = 0.0;
+		
 		self.alwaysBounceVertical = YES;
 		self.showsVerticalScrollIndicator = YES;
 		self.showsHorizontalScrollIndicator = NO;
@@ -113,16 +120,26 @@
 		if (scrollingDownwards) {
 			// scrolling down
 
-			NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
-			CGFloat fullHeightForRow = [self heightForRow:rowRelativeToOffset];
-			
-			if (self.contentOffset.y <= fullHeightForRow) {
-				// lets warp in a row!
-				[self layoutRow:rowRelativeToOffset-1 
-					   atHeight:[self delegateHeightForRow:rowRelativeToOffset-1] 
-					scrollingUp:NO];
+			// decide if we are even gonna warp in new rows
+			if (__firstWarpedInRow > 0) {
+				NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
+				CGFloat fullHeightForRowRelativeToOffset = [self heightForRow:rowRelativeToOffset];
+				
+				if (self.contentOffset.y <= fullHeightForRowRelativeToOffset) {
+					// lets warp in a row!
+					[self layoutRow:rowRelativeToOffset-1 
+						   atHeight:[self delegateHeightForRow:rowRelativeToOffset-1] 
+						scrollingUp:NO];
+					
+					__firstWarpedInRow = rowRelativeToOffset-1;
+					__firstWarpedInRowHeight = fullHeightForRowRelativeToOffset;
+				}
 			}
 			
+			// decide if we need to warp out a row that's now hidden
+			if (__lastWarpedInRowHeight >= (self.contentOffset.y + self.frame.size.height)) {
+
+			}
 			
 		} else {
 			// scrolling up
@@ -215,7 +232,7 @@
 #pragma mark -
 #pragma mark Reusable Views
 
--(UIView *)dequeueReusableCellWithIdenitifer:(NSString *)identifier {
+-(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier {
 
 	NSMutableArray *stack = [__reusableViews objectForKey:identifier];
 	
@@ -245,6 +262,10 @@
 
 #pragma mark -
 #pragma mark Delegate/Datasource Methods
+
+// inspired by Peter Steinberger's article at
+// http://petersteinberger.com/2011/09/fast-and-elegant-delegation-in-objective-c/
+// keeps things clean
 
 -(CGFloat)delegateHeightForRow:(NSUInteger)row {
 	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
