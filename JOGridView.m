@@ -152,7 +152,15 @@
 			[debugInfoLabel removeFromSuperview];
 		}
 				
-	} 
+	} else {
+		
+		// as a precaution, move all cells into hiding position if datasource
+		// is not dirty but we call a reload data
+		
+		for (UIView *view in self.subviews) {
+			view.frame = CGRectMake(-CGFLOAT_MAX, -CGFLOAT_MAX, 0, 0);
+		}
+	}
 	
 	// layout the cells
 	
