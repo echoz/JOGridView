@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface JOGridViewCell : UIView {
-	NSString *__reuseIdentifier;
-	UILabel *textLabel;
+	NSString*	__reuseIdentifier;
+	UILabel*	textLabel;
 }
 @property (readonly) UILabel *textLabel;
 @property (nonatomic, copy) NSString *reuseIdentifier;

@@ -14,16 +14,18 @@
 
 - (id)initWithFrame:(CGRect)frame
 {
-    self = [super initWithFrame:frame];
-    if (self) {
+    if ((self = [super initWithFrame:frame])) {
         // Initialization code
+		self.clipsToBounds = YES;
+		
 		textLabel = [[UILabel alloc] initWithFrame:frame];
 		textLabel.backgroundColor = [UIColor clearColor];
 		textLabel.textColor = [UIColor blackColor];
 		textLabel.textAlignment = UITextAlignmentCenter;
-		[self addSubview:textLabel];
 		textLabel.text = @"";
-		self.clipsToBounds = YES;
+
+		[self addSubview:textLabel];
+
     }
     return self;
 }
@@ -37,14 +39,5 @@
 -(void)layoutSubviews {
 	textLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
 }
-
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
 
 @end
