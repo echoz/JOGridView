@@ -21,7 +21,6 @@
 
 @implementation JOGridView
 @synthesize datasource = gridViewDataSource;
-@synthesize cellSpacing = __cellSpacing;
 
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
