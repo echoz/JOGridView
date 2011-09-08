@@ -198,7 +198,7 @@
 			}
 			
 			// decide if we need to warp out a row that's now hidden
-			if (__lastWarpedInRow < __rows) {
+			if (__lastWarpedInRow < __rows-1) {
 				if ((__lastWarpedInRowHeight - [self delegateHeightForRow:__lastWarpedInRow]) <= (self.contentOffset.y + self.frame.size.height)) {
 					NSArray *rowToEnqueue = [__visibleRows lastObject];
 					[__visibleRows removeLastObject];
@@ -216,7 +216,7 @@
 		} else {
 			// scrolling up
 
-			if (__lastWarpedInRow < __rows) {
+			if (__lastWarpedInRow < __rows-1) {
 				
 				if (__lastWarpedInRowHeight >= (self.contentOffset.y + self.frame.size.height)) {
 					
