@@ -56,9 +56,7 @@
 		self.clipsToBounds = YES;
 		self.pagingEnabled = NO;
 		self.scrollEnabled = YES;	
-		
-		[super setDelegate:self];
-		
+				
 		debugInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, self.frame.size.height - 10 - 22.0, 100.0, 22.0)];
 		debugInfoLabel.textAlignment = UITextAlignmentCenter;
 		debugInfoLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
@@ -231,22 +229,32 @@
 					   atHeight:__firstWarpedInRowHeight
 					scrollingUp:NO];
 				
-			}
-			
-			// decide if we need to warp out a row that's now hidden
-			
-			while (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
-				NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
-				[__visibleRows removeLastObject];
+				// decide if we need to warp out a row that's now hidden
 				
-				for (JOGridViewCell *cell in rowToEnqueue) {
-					[self enqueueReusableCell:cell];
+				if (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
+					NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
+					[__visibleRows removeLastObject];
+					
+					for (JOGridViewCell *cell in rowToEnqueue) {
+						[self enqueueReusableCell:cell];
+					}
+					[rowToEnqueue release];
+					
+					__lastWarpedInRow--;
+					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 				}
-				[rowToEnqueue release];
 				
-				__lastWarpedInRow--;
-				__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
+				// agressive enqueuing of anything below the supposedly 
+				// last visible row
+				for (UIView *view in self.subviews) {
+					if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y > __lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow])) {
+						[self enqueueReusableCell:(JOGridViewCell *)view];
+					}
+				}
+				
 			}
+			
+				
 			
 		} else {
 			// scrolling up
@@ -260,26 +268,31 @@
 					   atHeight:__lastWarpedInRowHeight
 					scrollingUp:YES];
 				
-			}
-			
-			// deal with enqueueing
-			while (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
+				// deal with enqueueing
+				if (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
+					
+					NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
+					[__visibleRows removeObjectAtIndex:0];
+					
+					for (JOGridViewCell *cell in rowToEnqueue) {
+						[self enqueueReusableCell:cell];
+					}
+					
+					[rowToEnqueue release];
+					
+					__firstWarpedInRow++;
+					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
+					
+				}				
 				
-				NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
-				[__visibleRows removeObjectAtIndex:0];
-				
-				for (JOGridViewCell *cell in rowToEnqueue) {
-					[self enqueueReusableCell:cell];
+				for (UIView *view in self.subviews) {
+					if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y < __firstWarpedInRowHeight)) {
+						[self enqueueReusableCell:(JOGridViewCell *)view];
+					}
 				}
 				
-				[rowToEnqueue release];
-				
-				__firstWarpedInRow++;
-				__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
-				
-			}				
-			
-			
+			}
+
 		}	
 	}
 	

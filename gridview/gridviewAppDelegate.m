@@ -74,16 +74,18 @@
 #pragma mark JOGridView Stuff
 
 -(NSUInteger)rowsForGridView:(JOGridView *)gridView {
-	return 100;
+	return 10;
 }
 
 -(NSUInteger)columnsForGridView:(JOGridView *)gridView {
-	return 2;
+	return 5;
 }
 
+
 -(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row {
-	return 160.0;
+	return 64.0;
 }
+
 
 -(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
 	static NSString *identifier = @"cell";
@@ -110,8 +112,8 @@
 }
 
 -(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
-	cell.backgroundColor = [gridviewAppDelegate randomColor];
 	cell.textLabel.text = [NSString stringWithFormat:@"%i:%i", indexPath.section, indexPath.row];
+	cell.textLabel.backgroundColor = [gridviewAppDelegate randomColor];
 }
 
 
