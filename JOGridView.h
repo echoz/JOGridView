@@ -40,6 +40,8 @@
 	NSUInteger		__rows;
 	NSUInteger		__columns;
 	
+	BOOL			__dataSourceDirty;
+	
 	NSMutableArray*	__visibleRows;
 	NSMutableArray*	__reusableViews;
 	

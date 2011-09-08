@@ -31,8 +31,11 @@
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
 		__reusableViews = [[NSMutableDictionary alloc] initWithCapacity:0];
+		__visibleRows = [[NSMutableArray alloc] initWithCapacity:0];
 		__rows = 0;
 		__previousOffset = 0.0;
+		
+		__dataSourceDirty = YES;
 		
 		__firstWarpedInRow = 0;
 		__firstWarpedInRowHeight = 0.0;
@@ -75,12 +78,71 @@
 	return gridViewDelegate;
 }
 
+-(void)setDatasource:(id<JOGridViewDataSource>)datasource {
+	if (datasource != gridViewDataSource) {
+		gridViewDataSource = datasource;
+		__dataSourceDirty = YES;
+	}
+}
+
 #pragma mark -
-#pragma mark Views
+#pragma mark View/s
+
+-(void)purgeView {
+	[__visibleRows removeAllObjects];
+	[__reusableViews removeAllObjects];
+	
+	for (UIView *view in self.subviews) {
+		[view removeFromSuperview];
+	}
+}
 
 -(void)layoutSubviews {
-	// layout subviews
 	
+	// figure out the visible rows
+	
+	NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
+	CGFloat rowRelativeToOffsetHeight = [self heightForRow:rowRelativeToOffset];
+		
+	if (self.contentOffset.y == rowRelativeToOffsetHeight) {
+
+		// the offset is the height of the row that it is relative to means
+		// it has fully blocked that row ergo the correct first row is the
+		// subsequent one
+		
+		__firstWarpedInRow = rowRelativeToOffset+1;
+		__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+				
+	} else if (self.contentOffset.y < rowRelativeToOffsetHeight) {
+		
+		// the offset is partially blocking the row hence it is the first row
+		
+		__firstWarpedInRow = rowRelativeToOffset;
+		__firstWarpedInRowHeight = rowRelativeToOffsetHeight;
+		
+	}
+
+	// lets find the second row
+	CGFloat adjustedOffset = __firstWarpedInRowHeight - [self heightForRow:__firstWarpedInRow];
+	NSUInteger startrow = __firstWarpedInRow;
+	
+	while (adjustedOffset < (self.contentOffset.y + self.frame.size.height)) {
+		adjustedOffset += [self delegateHeightForRow:startrow];
+		startrow++;
+	}
+	
+	__lastWarpedInRow = startrow;
+	__lastWarpedInRow = adjustedOffset;
+
+	if (__dataSourceDirty) {
+		__dataSourceDirty = NO;
+		
+		[self purgeView];
+		
+		// recreate the cells and insert them
+	} 
+	
+	// layout the cells
 }
 
 -(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp {
