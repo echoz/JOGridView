@@ -15,8 +15,8 @@
 -(NSRange)rangeOfVisibleRows;
 -(void)setFirstVisibleRow:(NSUInteger)row;
 
--(CGFloat)heightForRow:(NSUInteger)row;
--(NSUInteger)rowForHeight:(CGFloat)height;
+-(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row;
+-(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height;
 
 // delegate datasource single point of entry
 -(CGFloat)delegateHeightForRow:(NSUInteger)row;
@@ -101,8 +101,8 @@
 	
 	// figure out the visible rows
 	
-	NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
-	CGFloat rowRelativeToOffsetHeight = [self heightForRow:rowRelativeToOffset];
+	NSUInteger rowRelativeToOffset = [self rowForHeightRelativeToOrigin:self.contentOffset.y];
+	CGFloat rowRelativeToOffsetHeight = [self heightRelativeToOriginForRow:rowRelativeToOffset];
 		
 	if (self.contentOffset.y == rowRelativeToOffsetHeight) {
 
@@ -111,7 +111,7 @@
 		// subsequent one
 		
 		__firstWarpedInRow = rowRelativeToOffset+1;
-		__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+		__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 				
 	} else if (self.contentOffset.y < rowRelativeToOffsetHeight) {
 		
@@ -123,7 +123,7 @@
 	}
 
 	// lets find the second row
-	CGFloat adjustedOffset = __firstWarpedInRowHeight - [self heightForRow:__firstWarpedInRow];
+	CGFloat adjustedOffset = __firstWarpedInRowHeight - [self heightRelativeToOriginForRow:__firstWarpedInRow];
 	NSUInteger startrow = __firstWarpedInRow;
 	
 	while (adjustedOffset < (self.contentOffset.y + self.frame.size.height)) {
@@ -188,7 +188,7 @@
 				if (self.contentOffset.y <= __firstWarpedInRowHeight) {
 					// lets warp in a row!
 					__firstWarpedInRow--;
-					__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 
 					[self layoutRow:__firstWarpedInRow
 						   atHeight:__firstWarpedInRowHeight
@@ -208,7 +208,7 @@
 					}
 					
 					__lastWarpedInRow--;
-					__lastWarpedInRowHeight = [self heightForRow:__lastWarpedInRow];
+					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 				}
 				
 			}
@@ -221,7 +221,7 @@
 				if (__lastWarpedInRowHeight >= (self.contentOffset.y + self.frame.size.height)) {
 					
 					__lastWarpedInRow++;
-					__lastWarpedInRowHeight = [self heightForRow:__lastWarpedInRow];
+					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 					
 					[self layoutRow:__lastWarpedInRow
 						   atHeight:__lastWarpedInRowHeight
@@ -242,7 +242,7 @@
 					}
 					
 					__firstWarpedInRow++;
-					__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 					
 				}				
 			}
@@ -255,7 +255,7 @@
 }
 
 
--(NSUInteger)rowForHeight:(CGFloat)height {
+-(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height {
 	
 	// find out the row that the current height represents all the way from the
 	// origin of the content view. if the height is exactly the height of the 
@@ -282,7 +282,7 @@
 	}
 }
 
--(CGFloat)heightForRow:(NSUInteger)row {
+-(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row {
 	
 	// returns the height for the row accurate to its full height from the 
 	// origin to the end of the row.
