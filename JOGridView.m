@@ -209,93 +209,94 @@
 	
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
-	//	NSLog(@"views in scrollview: %i", [self.subviews count]);
-	if (self.debug) {
-		debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", [self.subviews count]];		
-	}
-	
 	if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
-		if (scrollingDownwards) {
-			// scrolling down
-			
-			// decide if we are even gonna warp in new rows
-			
-			while ((__firstWarpedInRow > 0) && (self.contentOffset.y <= __firstWarpedInRowHeight)) {
-				// lets warp in a row!
-				__firstWarpedInRow--;
-				__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
+		if (self.debug) {
+			debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", [self.subviews count]];		
+		}
+		
+		if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
+			if (scrollingDownwards) {
+				// scrolling down
 				
-				[self layoutRow:__firstWarpedInRow
-					   atHeight:__firstWarpedInRowHeight
-					scrollingUp:NO];
+				// decide if we are even gonna warp in new rows
 				
-				// decide if we need to warp out a row that's now hidden
-				
-				if (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
-					NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
-					[__visibleRows removeLastObject];
-					
-					for (JOGridViewCell *cell in rowToEnqueue) {
-						[self enqueueReusableCell:cell];
-					}
-					[rowToEnqueue release];
-					
-					__lastWarpedInRow--;
-					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
-				}
-				
-				// agressive enqueuing of anything below the supposedly 
-				// last visible row
-				for (UIView *view in self.subviews) {
-					if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y > __lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow])) {
-						[self enqueueReusableCell:(JOGridViewCell *)view];
-					}
-				}
-				
-			}
-			
-				
-			
-		} else {
-			// scrolling up
-			
-			while ((__lastWarpedInRow < __rows-1) && ((self.contentOffset.y + self.frame.size.height) >= (__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]))) {
-				
-				__lastWarpedInRow++;
-				__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
-				
-				[self layoutRow:__lastWarpedInRow
-					   atHeight:__lastWarpedInRowHeight
-					scrollingUp:YES];
-				
-				// deal with enqueueing
-				if (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
-					
-					NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
-					[__visibleRows removeObjectAtIndex:0];
-					
-					for (JOGridViewCell *cell in rowToEnqueue) {
-						[self enqueueReusableCell:cell];
-					}
-					
-					[rowToEnqueue release];
-					
-					__firstWarpedInRow++;
+				while ((__firstWarpedInRow > 0) && (self.contentOffset.y <= __firstWarpedInRowHeight)) {
+					// lets warp in a row!
+					__firstWarpedInRow--;
 					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 					
-				}				
-				
-				for (UIView *view in self.subviews) {
-					if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y < __firstWarpedInRowHeight)) {
-						[self enqueueReusableCell:(JOGridViewCell *)view];
+					[self layoutRow:__firstWarpedInRow
+						   atHeight:__firstWarpedInRowHeight
+						scrollingUp:NO];
+					
+					// decide if we need to warp out a row that's now hidden
+					
+					if (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
+						NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
+						[__visibleRows removeLastObject];
+						
+						for (JOGridViewCell *cell in rowToEnqueue) {
+							[self enqueueReusableCell:cell];
+						}
+						[rowToEnqueue release];
+						
+						__lastWarpedInRow--;
+						__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 					}
+					
+					// agressive enqueuing of anything below the supposedly 
+					// last visible row
+					for (UIView *view in self.subviews) {
+						if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y > __lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow])) {
+							[self enqueueReusableCell:(JOGridViewCell *)view];
+						}
+					}
+					
 				}
 				
-			}
-
+				
+				
+			} else {
+				// scrolling up
+				
+				while ((__lastWarpedInRow < __rows-1) && ((self.contentOffset.y + self.frame.size.height) >= (__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]))) {
+					
+					__lastWarpedInRow++;
+					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
+					
+					[self layoutRow:__lastWarpedInRow
+						   atHeight:__lastWarpedInRowHeight
+						scrollingUp:YES];
+					
+					// deal with enqueueing
+					if (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
+						
+						NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
+						[__visibleRows removeObjectAtIndex:0];
+						
+						for (JOGridViewCell *cell in rowToEnqueue) {
+							[self enqueueReusableCell:cell];
+						}
+						
+						[rowToEnqueue release];
+						
+						__firstWarpedInRow++;
+						__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
+						
+					}				
+					
+					for (UIView *view in self.subviews) {
+						if (([view isKindOfClass:[JOGridViewCell class]]) && (view.frame.origin.x >= 0) && (view.frame.origin.y < __firstWarpedInRowHeight)) {
+							[self enqueueReusableCell:(JOGridViewCell *)view];
+						}
+					}
+					
+				}
+				
+			}	
 		}	
 	}
-	
+		
 	__previousOffset = self.contentOffset.y;
 }
 
