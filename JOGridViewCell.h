@@ -10,8 +10,9 @@
 
 @interface JOGridViewCell : UIView {
 	NSString *__reuseIdentifier;
+	UILabel *textLabel;
 }
-
+@property (readonly) UILabel *textLabel;
 @property (nonatomic, copy) NSString *reuseIdentifier;
 
 @end

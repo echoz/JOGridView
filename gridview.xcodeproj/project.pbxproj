@@ -243,6 +243,7 @@
 		3FBB3E6B1417055F00588168 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "gridview/gridview-Prefix.pch";
 				INFOPLIST_FILE = "gridview/gridview-Info.plist";
@@ -254,6 +255,7 @@
 		3FBB3E6C1417055F00588168 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "gridview/gridview-Prefix.pch";
 				INFOPLIST_FILE = "gridview/gridview-Info.plist";
@@ -281,6 +283,7 @@
 				3FBB3E6C1417055F00588168 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

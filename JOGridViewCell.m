@@ -10,14 +10,32 @@
 
 @implementation JOGridViewCell
 @synthesize reuseIdentifier = __reuseIdentifier;
+@synthesize textLabel;
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if (self) {
         // Initialization code
+		textLabel = [[UILabel alloc] initWithFrame:frame];
+		textLabel.backgroundColor = [UIColor clearColor];
+		textLabel.textColor = [UIColor blackColor];
+		textLabel.textAlignment = UITextAlignmentCenter;
+		[self addSubview:textLabel];
+		textLabel.text = @"";
+		self.clipsToBounds = YES;
     }
     return self;
+}
+
+-(void) dealloc {
+	[__reuseIdentifier release], __reuseIdentifier = nil;
+	[textLabel release], textLabel = nil;
+	[super dealloc];
+}
+
+-(void)layoutSubviews {
+	textLabel.frame = CGRectMake(0, 0, self.frame.size.width, self.frame.size.height);
 }
 
 /*

@@ -17,6 +17,8 @@
 	// Override point for customization after application launch.
 	[self.window makeKeyAndVisible];
 
+	[[UIApplication sharedApplication] setStatusBarHidden:YES];
+	
 	JOGridView *gridview = [[JOGridView alloc] initWithFrame:CGRectMake(0, 0, self.window.frame.size.width, self.window.frame.size.height)];
 	[self.window addSubview:gridview];
 	
@@ -72,7 +74,7 @@
 #pragma mark JOGridView Stuff
 
 -(NSUInteger)rowsForGridView:(JOGridView *)gridView {
-	return 20;
+	return 100;
 }
 
 -(NSUInteger)columnsForGridView:(JOGridView *)gridView {
@@ -80,7 +82,9 @@
 }
 
 -(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
-	JOGridViewCell *cell = [gridView dequeueReusableCellWithIdenitifer:@"cell"];
+	static NSString *identifier = @"cell";
+	
+	JOGridViewCell *cell = [gridView dequeueReusableCellWithIdenitifer:identifier];
 	
 	if (!cell) {
 		cell = [[JOGridViewCell alloc] init];
@@ -90,8 +94,17 @@
 	return cell;
 }
 
++ (UIColor *) randomColor
+{
+	CGFloat red =  (CGFloat)random()/(CGFloat)RAND_MAX;
+	CGFloat blue = (CGFloat)random()/(CGFloat)RAND_MAX;
+	CGFloat green = (CGFloat)random()/(CGFloat)RAND_MAX;
+	return [UIColor colorWithRed:red green:green blue:blue alpha:1.0];
+}
+
 -(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
-	cell.backgroundColor = [UIColor greenColor];
+	cell.backgroundColor = [gridviewAppDelegate randomColor];
+	cell.textLabel.text = [NSString stringWithFormat:@"%i:%i", indexPath.section, indexPath.row];
 }
 
 
