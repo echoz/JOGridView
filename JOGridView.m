@@ -207,6 +207,8 @@
 }
 
 -(void)layoutSubviews {
+	[super layoutSubviews];
+	
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
 	//	NSLog(@"views in scrollview: %i", [self.subviews count]);
