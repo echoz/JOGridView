@@ -41,7 +41,7 @@
 	NSUInteger		__columns;
 	
 	NSMutableArray*	__visibleRows;
-	NSCache*		__reusableViews;
+	NSMutableArray*	__reusableViews;
 	
 	id <JOGridViewDelegate> gridViewDelegate;
 	id <JOGridViewDataSource> gridViewDataSource;

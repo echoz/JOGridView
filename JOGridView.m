@@ -122,28 +122,69 @@
 
 			// decide if we are even gonna warp in new rows
 			if (__firstWarpedInRow > 0) {
-				NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
-				CGFloat fullHeightForRowRelativeToOffset = [self heightForRow:rowRelativeToOffset];
 				
-				if (self.contentOffset.y <= fullHeightForRowRelativeToOffset) {
+				if (self.contentOffset.y <= __firstWarpedInRowHeight) {
 					// lets warp in a row!
-					[self layoutRow:rowRelativeToOffset-1 
-						   atHeight:[self delegateHeightForRow:rowRelativeToOffset-1] 
+					__firstWarpedInRow--;
+					__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+
+					[self layoutRow:__firstWarpedInRow
+						   atHeight:__firstWarpedInRowHeight
 						scrollingUp:NO];
 					
-					__firstWarpedInRow = rowRelativeToOffset-1;
-					__firstWarpedInRowHeight = fullHeightForRowRelativeToOffset;
 				}
 			}
 			
 			// decide if we need to warp out a row that's now hidden
-			if (__lastWarpedInRowHeight >= (self.contentOffset.y + self.frame.size.height)) {
-
+			if (__lastWarpedInRow < __rows) {
+				if ((__lastWarpedInRowHeight - [self delegateHeightForRow:__lastWarpedInRow]) <= (self.contentOffset.y + self.frame.size.height)) {
+					NSArray *rowToEnqueue = [__visibleRows lastObject];
+					[__visibleRows removeLastObject];
+					
+					for (JOGridViewCell *cell in rowToEnqueue) {
+						[self enqueueReusableCell:cell];
+					}
+					
+					__lastWarpedInRow--;
+					__lastWarpedInRowHeight = [self heightForRow:__lastWarpedInRow];
+				}
+				
 			}
 			
 		} else {
 			// scrolling up
-			NSLog(@"going up  %f", self.contentOffset.y);
+
+			if (__lastWarpedInRow < __rows) {
+				
+				if (__lastWarpedInRowHeight >= (self.contentOffset.y + self.frame.size.height)) {
+					
+					__lastWarpedInRow++;
+					__lastWarpedInRowHeight = [self heightForRow:__lastWarpedInRow];
+					
+					[self layoutRow:__lastWarpedInRow
+						   atHeight:__lastWarpedInRowHeight
+						scrollingUp:YES];
+					
+				}
+			}
+			
+			// deal with enqueueing
+			
+			if (__firstWarpedInRow > 0) {
+				if ((__firstWarpedInRowHeight - [self delegateHeightForRow:__firstWarpedInRow]) >= self.contentOffset.y) {
+					NSArray *rowToEnqueue = [__visibleRows objectAtIndex:0];
+					[__visibleRows removeObjectAtIndex:0];
+					
+					for (JOGridViewCell *cell in rowToEnqueue) {
+						[self enqueueReusableCell:cell];
+					}
+					
+					__firstWarpedInRow++;
+					__firstWarpedInRowHeight = [self heightForRow:__firstWarpedInRow];
+					
+				}				
+			}
+			
 			
 		}
 		__previousOffset = self.contentOffset.y;
@@ -222,6 +263,9 @@
 		
 		[self setNeedsLayout];
 		
+		// TODO: warp in cells for current view		
+
+		
 	} else {
 		NSLog(@"Y U NO CONFIRM TO PROPER REQUIRED PROTOCOL?");
 		
@@ -259,6 +303,7 @@
 		[__reusableViews setObject:array forKey:cell.reuseIdentifier];
 	}
 }
+
 
 #pragma mark -
 #pragma mark Delegate/Datasource Methods
