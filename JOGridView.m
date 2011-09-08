@@ -210,6 +210,11 @@
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
 	if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
+		
+		if (__dataSourceDirty) {
+			[self reloadData];
+		}
+		
 		if (self.debug) {
 			debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", [self.subviews count]];		
 		}
