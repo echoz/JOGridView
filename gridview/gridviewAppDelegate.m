@@ -100,6 +100,9 @@
 
 + (UIColor *) randomColor
 {
+	// stolen from http://kwigbo.com/post/680994703/iphone-sdk-random-uicolor
+	// because i was lazy to write my own
+	
 	CGFloat red =  (CGFloat)random()/(CGFloat)RAND_MAX;
 	CGFloat blue = (CGFloat)random()/(CGFloat)RAND_MAX;
 	CGFloat green = (CGFloat)random()/(CGFloat)RAND_MAX;
