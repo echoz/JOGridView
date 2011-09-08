@@ -28,7 +28,7 @@
 -(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 @end
 
-@interface JOGridView : UIScrollView <UIScrollViewDelegate> {
+@interface JOGridView : UIScrollView {
 	
 	// debug
 	
@@ -56,8 +56,9 @@
 	id <JOGridViewDelegate> gridViewDelegate;
 	id <JOGridViewDataSource> gridViewDataSource;
 }
-@property (readwrite) BOOL debug;
 @property (nonatomic, assign) id<JOGridViewDataSource> datasource;
+@property (nonatomic, assign) id <JOGridViewDelegate> delegate;
+@property (readwrite) BOOL debug;
 
 -(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;

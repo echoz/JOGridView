@@ -30,7 +30,7 @@
 @end
 
 @implementation JOGridView
-@synthesize datasource = gridViewDataSource;
+@synthesize datasource = gridViewDataSource, delegate = gridViewDelegate;
 @synthesize debug;
 
 - (id)initWithFrame:(CGRect)frame {
@@ -78,18 +78,6 @@
 
 #pragma mark -
 #pragma mark Override Accessors
-
--(void)setDelegate:(id<JOGridViewDelegate, UIScrollViewDelegate>)delegate {
-	if (delegate != (id<JOGridViewDelegate, UIScrollViewDelegate>)self) {
-		gridViewDelegate = delegate;
-	}
-	
-	[super setDelegate:self];
-}
-
--(id<JOGridViewDelegate>)delegate {
-	return gridViewDelegate;
-}
 
 -(void)setDatasource:(id<JOGridViewDataSource>)datasource {
 	if (datasource != gridViewDataSource) {
@@ -218,8 +206,7 @@
 	}
 }
 
--(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-	
+-(void)layoutSubviews {
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
 	//	NSLog(@"views in scrollview: %i", [self.subviews count]);
@@ -232,7 +219,7 @@
 			// scrolling down
 			
 			// decide if we are even gonna warp in new rows
-				
+			
 			while ((__firstWarpedInRow > 0) && (self.contentOffset.y <= __firstWarpedInRowHeight)) {
 				// lets warp in a row!
 				__firstWarpedInRow--;
@@ -295,11 +282,6 @@
 	}
 	
 	__previousOffset = self.contentOffset.y;
-	
-
-}
-
--(void)layoutSubviews {
 }
 
 -(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height {
