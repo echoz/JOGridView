@@ -30,6 +30,9 @@
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
 	
+	BOOL					debug;
+	UILabel*				debugInfoLabel;
+	
 	NSUInteger				__firstWarpedInRow;
 	CGFloat					__firstWarpedInRowHeight;
 	NSUInteger				__lastWarpedInRow;
@@ -48,6 +51,7 @@
 	id <JOGridViewDelegate> gridViewDelegate;
 	id <JOGridViewDataSource> gridViewDataSource;
 }
+@property (readwrite) BOOL debug;
 @property (nonatomic, assign) id<JOGridViewDataSource> datasource;
 
 -(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;

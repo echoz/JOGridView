@@ -7,7 +7,7 @@
 //
 
 #import "JOGridView.h"
-#import <tgmath.h>
+#import <QuartzCore/QuartzCore.h>
 
 #define JOGRIDVIEW_DEFAULT_ROW_HEIGHT 44.0
 
@@ -31,6 +31,7 @@
 
 @implementation JOGridView
 @synthesize datasource = gridViewDataSource;
+@synthesize debug;
 
 - (id)initWithFrame:(CGRect)frame {
 	if ((self = [super initWithFrame:frame])) {
@@ -57,6 +58,14 @@
 		self.scrollEnabled = YES;	
 		
 		[super setDelegate:self];
+		
+		debugInfoLabel = [[UILabel alloc] initWithFrame:CGRectMake(10, self.frame.size.height - 10 - 22.0, 100.0, 22.0)];
+		debugInfoLabel.textAlignment = UITextAlignmentCenter;
+		debugInfoLabel.baselineAdjustment = UIBaselineAdjustmentAlignCenters;
+		debugInfoLabel.backgroundColor = [UIColor whiteColor];
+		debugInfoLabel.textColor = [UIColor blackColor];
+		debugInfoLabel.layer.cornerRadius = 5.0;
+		debugInfoLabel.font = [UIFont systemFontOfSize:10.0];
 	}
 
     return self;
@@ -151,6 +160,12 @@
 			[__visibleRows addObject:rowArray];
 		}
 		
+		if (self.debug) {			
+			[self.superview addSubview:debugInfoLabel];
+		} else {
+			[debugInfoLabel removeFromSuperview];
+		}
+				
 	} 
 	
 	// layout the cells
@@ -203,10 +218,13 @@
 	}
 }
 
--(void)layoutSubviews {
+-(void)scrollViewDidScroll:(UIScrollView *)scrollView {
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
 	//	NSLog(@"views in scrollview: %i", [self.subviews count]);
+	if (self.debug) {
+		debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", [self.subviews count]];		
+	}
 	
 	if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
 		if (scrollingDownwards) {
@@ -241,12 +259,12 @@
 				__lastWarpedInRow--;
 				__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 			}
-						
+			
 		} else {
 			// scrolling up
 			
 			if (__lastWarpedInRow < __rows-1) {
-								
+				
 				if ((__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]) <= (self.contentOffset.y + self.frame.size.height)) {
 					
 					__lastWarpedInRow++;
@@ -281,7 +299,11 @@
 	}
 	
 	__previousOffset = self.contentOffset.y;
+	
 
+}
+
+-(void)layoutSubviews {
 }
 
 -(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height {

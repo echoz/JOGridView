@@ -21,7 +21,7 @@
 	
 	JOGridView *gridview = [[JOGridView alloc] initWithFrame:CGRectMake(0, 0, self.window.frame.size.width, self.window.frame.size.height)];
 	[self.window addSubview:gridview];
-	
+	gridview.debug = YES;
 	gridview.delegate = self;
 	gridview.datasource = self;
 	[gridview reloadData];
