@@ -16,7 +16,13 @@
 -(void)setFirstVisibleRow:(NSUInteger)row;
 
 -(CGFloat)heightForRow:(NSUInteger)row;
--(NSUInteger)rowForOffset:(CGFloat)offset;
+-(NSUInteger)rowForHeight:(CGFloat)height;
+
+// delegate datasource single point of entry
+-(CGFloat)delegateHeightForRow:(NSUInteger)row;
+-(JOGridViewCell *)dataSourceCellAtIndexPath:(NSIndexPath *)indexPath;
+-(void)delegateWillDisplayCell:(JOGridViewCell *)cell atIndexPath:(NSIndexPath *)indexPath;
+
 @end
 
 @implementation JOGridView
@@ -72,15 +78,8 @@
 
 -(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp {
 	
-	CGFloat rowHeight = 0.0;
-	
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-		// find height or starting point of where to add the new row
-		rowHeight = [gridViewDelegate gridView:self heightForRow:row];
-	} else {
-		rowHeight = JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
-	}
-	
+	CGFloat rowHeight = [self delegateHeightForRow:row];
+		
 	NSUInteger cols = [gridViewDataSource columnsForGridView:self];
 		
 	JOGridViewCell *cell = nil;
@@ -88,11 +87,10 @@
 	NSMutableArray *rowOfCells = [NSMutableArray arrayWithCapacity:cols];
 	
 	for (int i=0;i<cols;i++) {
-		cell = [gridViewDataSource cellForGridView:self atIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
-		if ([gridViewDelegate respondsToSelector:@selector(willDisplayCell:forGridView:atIndexPath:)]) {
-			[gridViewDelegate willDisplayCell:cell forGridView:self atIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
-		}
+		cell = [self dataSourceCellAtIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
 
+		[self delegateWillDisplayCell:cell atIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
+		
 		[self addSubview:cell];
 		
 		cell.frame = CGRectMake(i/cols * self.frame.size.width, height - rowHeight, self.frame.size.width / cols, rowHeight);
@@ -114,7 +112,17 @@
 
 		if (scrollingDownwards) {
 			// scrolling down
-			NSLog(@"going down %f", self.contentOffset.y);
+
+			NSUInteger rowRelativeToOffset = [self rowForHeight:self.contentOffset.y];
+			CGFloat fullHeightForRow = [self heightForRow:rowRelativeToOffset];
+			
+			if (self.contentOffset.y <= fullHeightForRow) {
+				// lets warp in a row!
+				[self layoutRow:rowRelativeToOffset-1 
+					   atHeight:[self delegateHeightForRow:rowRelativeToOffset-1] 
+					scrollingUp:NO];
+			}
+			
 			
 		} else {
 			// scrolling up
@@ -126,30 +134,39 @@
 	
 }
 
--(NSUInteger)rowForOffset:(CGFloat)offset {
+
+-(NSUInteger)rowForHeight:(CGFloat)height {
 	
+	// find out the row that the current height represents all the way from the
+	// origin of the content view. if the height is exactly the height of the 
+	// row or less than the height, it is that row
+
 	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
 
-		CGFloat height = 0.0;
+		CGFloat calcheight = 0.0;
 		int i=0;
 		
-		while (height < offset) {
-			height += [gridViewDelegate gridView:self heightForRow:i];			
+		while (calcheight < height) {
+			calcheight += [gridViewDelegate gridView:self heightForRow:i];			
 			i++;
 		}
 					
-		if (height >= offset) {
+		if (calcheight >= height) {
 			return i;
 		} else {
 			return 0;
 		}		
 		
 	} else {
-		return (NSUInteger)(offset / JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
+		return (NSUInteger)(height / JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
 	}
 }
 
 -(CGFloat)heightForRow:(NSUInteger)row {
+	
+	// returns the height for the row accurate to its full height from the 
+	// origin to the end of the row.
+	
 	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
 		CGFloat height = 0.0;
 		
@@ -225,5 +242,31 @@
 		[__reusableViews setObject:array forKey:cell.reuseIdentifier];
 	}
 }
+
+#pragma mark -
+#pragma mark Delegate Methods
+
+-(CGFloat)delegateHeightForRow:(NSUInteger)row {
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+		return [gridViewDelegate gridView:self heightForRow:row];
+	} else {
+		return JOGRIDVIEW_DEFAULT_ROW_HEIGHT;
+	}
+}
+
+-(JOGridViewCell *)dataSourceCellAtIndexPath:(NSIndexPath *)indexPath {
+	if ([gridViewDataSource respondsToSelector:@selector(cellForGridView:atIndexPath:)]) {
+		return [gridViewDataSource cellForGridView:self atIndexPath:indexPath];
+	} else {
+		return nil;
+	}
+}
+
+-(void)delegateWillDisplayCell:(JOGridViewCell *)cell atIndexPath:(NSIndexPath *)indexPath {
+	if ([gridViewDelegate respondsToSelector:@selector(willDisplayCell:forGridView:atIndexPath:)]) {
+		[gridViewDelegate willDisplayCell:cell forGridView:self atIndexPath:indexPath];
+	}
+}
+
 
 @end
