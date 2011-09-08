@@ -30,19 +30,24 @@
 
 @interface JOGridView : UIScrollView <UIScrollViewDelegate> {
 	
+	// debug
+	
 	BOOL					debug;
 	UILabel*				debugInfoLabel;
+	
+	// cached data
+	
+	NSUInteger				__rows;
+	NSUInteger				__columns;
 	
 	NSUInteger				__firstWarpedInRow;
 	CGFloat					__firstWarpedInRowHeight;
 	NSUInteger				__lastWarpedInRow;
 	CGFloat					__lastWarpedInRowHeight;
 	
+	// ivar properties
+	
 	CGFloat					__previousOffset;
-	
-	NSUInteger				__rows;
-	NSUInteger				__columns;
-	
 	BOOL					__dataSourceDirty;
 	
 	NSMutableArray*			__visibleRows;

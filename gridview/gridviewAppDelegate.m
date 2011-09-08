@@ -78,7 +78,11 @@
 }
 
 -(NSUInteger)columnsForGridView:(JOGridView *)gridView {
-	return 3;
+	return 2;
+}
+
+-(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row {
+	return 160.0;
 }
 
 -(JOGridViewCell *)cellForGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath {
