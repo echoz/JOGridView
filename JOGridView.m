@@ -219,6 +219,7 @@
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
+	
 	BOOL scrollingDownwards = (__previousOffset > self.contentOffset.y) ? YES : NO;
 	
 	//	NSLog(@"views in scrollview: %i", [self.subviews count]);
@@ -231,23 +232,21 @@
 			// scrolling down
 			
 			// decide if we are even gonna warp in new rows
-			if (__firstWarpedInRow > 0) {
 				
-				if (self.contentOffset.y <= __firstWarpedInRowHeight) {
-					// lets warp in a row!
-					__firstWarpedInRow--;
-					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
-					
-					[self layoutRow:__firstWarpedInRow
-						   atHeight:__firstWarpedInRowHeight
-						scrollingUp:NO];
-					
-				}
+			while ((__firstWarpedInRow > 0) && (self.contentOffset.y <= __firstWarpedInRowHeight)) {
+				// lets warp in a row!
+				__firstWarpedInRow--;
+				__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
+				
+				[self layoutRow:__firstWarpedInRow
+					   atHeight:__firstWarpedInRowHeight
+					scrollingUp:NO];
+				
 			}
 			
 			// decide if we need to warp out a row that's now hidden
 			
-			if (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
+			while (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
 				NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
 				[__visibleRows removeLastObject];
 				
@@ -263,22 +262,19 @@
 		} else {
 			// scrolling up
 			
-			if (__lastWarpedInRow < __rows-1) {
+			while ((__lastWarpedInRow < __rows-1) && ((self.contentOffset.y + self.frame.size.height) >= (__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]))) {
 				
-				if ((__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]) <= (self.contentOffset.y + self.frame.size.height)) {
-					
-					__lastWarpedInRow++;
-					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
-					
-					[self layoutRow:__lastWarpedInRow
-						   atHeight:__lastWarpedInRowHeight
-						scrollingUp:YES];
-					
-				}
+				__lastWarpedInRow++;
+				__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
+				
+				[self layoutRow:__lastWarpedInRow
+					   atHeight:__lastWarpedInRowHeight
+					scrollingUp:YES];
+				
 			}
 			
 			// deal with enqueueing
-			if (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
+			while (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
 				
 				NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
 				[__visibleRows removeObjectAtIndex:0];
