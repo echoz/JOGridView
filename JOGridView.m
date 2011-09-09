@@ -30,6 +30,7 @@
 @end
 
 @implementation JOGridView
+@synthesize visibleRows = __visibleRows, allowsSelecton;
 @synthesize datasource = gridViewDataSource, delegate = gridViewDelegate;
 @synthesize debug;
 

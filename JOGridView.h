@@ -45,6 +45,11 @@
 	NSUInteger				__lastWarpedInRow;
 	CGFloat					__lastWarpedInRowHeight;
 	
+    // configuration
+    
+    BOOL                    allowsSelection;
+    
+    
 	// ivar properties
 	
 	CGFloat					__previousOffset;
@@ -60,7 +65,30 @@
 @property (nonatomic, assign) id <JOGridViewDelegate> delegate;
 @property (readwrite) BOOL debug;
 
+// cell accessors
+@property (readonly) NSArray *visibleRows;
+-(NSIndexPath *)indexPathForCell:(JOGridViewCell *)cell;
+-(NSIndexPath *)indexPathsForVisibleCells;
+-(JOGridViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath;
+
+// selections
+@property (readwrite) BOOL allowsSelecton;
+-(NSIndexPath *)indexPathForSelectedCell;
+-(void)selectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
+-(void)deselectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
+
+// scrolling
+-(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated;
+-(void)scrollToIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
+
+// gridview properties
+-(NSUInteger)numberOfRows;
+-(NSUInteger)numberOfColumnsInRow:(NSUInteger)row;
+
+// reload methods
 -(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;
+-(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath;
+-(void)reloadRow:(NSUInteger)row;
 
 @end
