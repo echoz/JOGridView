@@ -92,7 +92,7 @@
 	JOGridViewCell *cell = [gridView dequeueReusableCellWithIdenitifer:identifier];
 	
 	if (!cell) {
-		cell = [[JOGridViewCell alloc] init];
+		cell = [[[JOGridViewCell alloc] init] autorelease];
 		cell.reuseIdentifier = @"cell";
 	}
 	
