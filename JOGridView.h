@@ -17,6 +17,7 @@
 @optional
 -(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 -(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
+// implement selection events
 @end
 
 /// Data Sources are required
