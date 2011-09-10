@@ -236,8 +236,8 @@
 				
 				while ((__firstWarpedInRow > 0) && (self.contentOffset.y <= __firstWarpedInRowHeight)) {
 					// lets warp in a row!
+					__firstWarpedInRowHeight -= [self delegateHeightForRow:__firstWarpedInRow];
 					__firstWarpedInRow--;
-					__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 					
 					[self layoutRow:__firstWarpedInRow
 						   atHeight:__firstWarpedInRowHeight
@@ -245,7 +245,7 @@
 					
 					// decide if we need to warp out a row that's now hidden
 					
-					if (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
+					while (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
 						NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
 						[__visibleRows removeLastObject];
 						
@@ -254,8 +254,8 @@
 						}
 						[rowToEnqueue release];
 						
+						__lastWarpedInRowHeight -= [self delegateHeightForRow:__lastWarpedInRow];
 						__lastWarpedInRow--;
-						__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 					}
 					
 					// agressive enqueuing of anything below the supposedly 
@@ -275,15 +275,15 @@
 				
 				while ((__lastWarpedInRow < __rows-1) && ((self.contentOffset.y + self.frame.size.height) >= (__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]))) {
 					
+					__lastWarpedInRowHeight += [self delegateHeightForRow:__lastWarpedInRow];
 					__lastWarpedInRow++;
-					__lastWarpedInRowHeight = [self heightRelativeToOriginForRow:__lastWarpedInRow];
 					
 					[self layoutRow:__lastWarpedInRow
 						   atHeight:__lastWarpedInRowHeight
 						scrollingUp:YES];
 					
 					// deal with enqueueing
-					if (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
+					while (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
 						
 						NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
 						[__visibleRows removeObjectAtIndex:0];
@@ -294,8 +294,8 @@
 						
 						[rowToEnqueue release];
 						
+						__firstWarpedInRowHeight += [self delegateHeightForRow:__firstWarpedInRow];
 						__firstWarpedInRow++;
-						__firstWarpedInRowHeight = [self heightRelativeToOriginForRow:__firstWarpedInRow];
 						
 					}				
 					
