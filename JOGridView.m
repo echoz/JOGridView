@@ -33,7 +33,7 @@
 @end
 
 @implementation JOGridView
-@synthesize visibleRows = __visibleRows, allowsSelecton;
+@synthesize visibleRows = __visibleRows;
 @synthesize datasource = gridViewDataSource, delegate = gridViewDelegate;
 @synthesize numberOfRows = __rows, numberOfColumns = __columns;
 @synthesize debug;
@@ -77,6 +77,7 @@
 }
 
 -(void)dealloc {
+
 	[debugInfoLabel release], debugInfoLabel = nil;
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[__reusableViews release], __reusableViews = nil;
@@ -221,6 +222,8 @@
 -(JOGridViewCell *)cellForlayoutAtIndexPath:(NSIndexPath *)indexPath atHeight:(CGFloat)height {
     JOGridViewCell *cell = [self dataSourceCellAtIndexPath:indexPath];
     
+	NSAssert(cell != nil, @"Cells cannot be nil!");
+	
     [self delegateWillDisplayCell:cell atIndexPath:indexPath];
     
     if (!cell.superview) {
@@ -372,8 +375,56 @@
 	}
 }
 
-#pragma mark - 
-#pragma mark Scrolling to Cells!
+#pragma mark -
+#pragma mark Cell Accessors
+
+-(NSIndexPath *)indexPathForVisibleCell:(JOGridViewCell *)cell {
+	NSArray *rowOfCells = nil;
+	
+	for (int i=0;i<[__visibleRows count];i++) {
+		rowOfCells = [__visibleRows objectAtIndex:i];
+		
+		for (int q=0;q<[rowOfCells count];q++) {
+			if ([rowOfCells objectAtIndex:q] == cell) {
+				return [NSIndexPath indexPathForRow:q inSection:i];
+			}
+		}
+	}
+	
+	return nil;
+}
+
+-(NSArray *)indexPathsForVisibleCells {
+
+	NSArray *cellsForRow = nil;
+	NSMutableArray *indexpaths = [NSMutableArray arrayWithCapacity:(__lastWarpedInRow-__firstWarpedInRow+1)*__columns];
+	
+	for (NSUInteger i=__firstWarpedInRow;i<__lastWarpedInRow+1;i++) {
+		cellsForRow = [__visibleRows objectAtIndex:i];
+		
+		for (int q=0;q<[cellsForRow count];q++) {
+			[indexpaths addObject:[NSIndexPath indexPathForRow:q inSection:i]];
+		}
+	}
+	
+	return indexpaths;
+}
+
+-(JOGridViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+	JOGridViewCell *cell = nil;
+	
+	if ((indexPath.section >= __firstWarpedInRow) && (indexPath.section <= __lastWarpedInRow)) {
+		cell = [[__visibleRows objectAtIndex:(indexPath.section - __firstWarpedInRow)] objectAtIndex:indexPath.row];
+	} else {
+		cell = [self dataSourceCellAtIndexPath:indexPath];
+	}
+	
+	return cell;
+}
+
+
+#pragma mark -
+#pragma mark Scrolling to Cells
 
 -(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated {
     if (row < __rows) {
@@ -443,6 +494,7 @@
 #pragma mark Reusable Views
 
 -(void)conserveMemory:(NSNotification *)notification {
+	
 	NSArray *reusuableCells = nil;
 	
 	for (id key in [__reusableViews keyEnumerator]) {

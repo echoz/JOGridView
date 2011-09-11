@@ -17,7 +17,6 @@
 @optional
 -(void)willDisplayCell:(JOGridViewCell *)cell forGridView:(JOGridView *)gridView atIndexPath:(NSIndexPath *)indexPath;
 -(CGFloat)gridView:(JOGridView *)gridview heightForRow:(NSUInteger)row;
-// implement selection events
 @end
 
 /// Data Sources are required
@@ -46,11 +45,6 @@
 	NSUInteger				__lastWarpedInRow;
 	CGFloat					__lastWarpedInRowHeight;
 	
-    // configuration
-    
-    BOOL                    allowsSelection;
-    
-    
 	// ivar properties
 	
 	CGFloat					__previousOffset;
@@ -68,15 +62,9 @@
 
 /// cell accessors
 @property (readonly) NSArray *visibleRows;
--(NSIndexPath *)indexPathForCell:(JOGridViewCell *)cell;
--(NSIndexPath *)indexPathsForVisibleCells;
+-(NSArray *)indexPathsForVisibleCells;
+-(NSIndexPath *)indexPathForVisibleCell:(JOGridViewCell *)cell;
 -(JOGridViewCell *)cellForRowAtIndexPath:(NSIndexPath *)indexPath;
-
-// selections
-@property (readwrite) BOOL allowsSelecton;
--(NSIndexPath *)indexPathForSelectedCell;
--(void)selectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
--(void)deselectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
 /// scrolling
 -(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated;
@@ -87,9 +75,9 @@
 @property (readonly) NSUInteger numberOfColumns;
 
 /// reload methods
--(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;
--(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath;
 -(void)reloadRow:(NSUInteger)row;
+-(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath;
+-(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 
 @end
