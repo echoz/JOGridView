@@ -68,6 +68,8 @@
 		debugInfoLabel.textColor = [UIColor blackColor];
 		debugInfoLabel.layer.cornerRadius = 5.0;
 		debugInfoLabel.font = [UIFont systemFontOfSize:10.0];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(conserveMemory:) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
 	}
 
     return self;
@@ -89,7 +91,7 @@
 }
 
 #pragma mark -
-#pragma mark View/s
+#pragma mark View Layout and Maintainence
 
 -(void)purgeCells {
 	[__visibleRows removeAllObjects];
@@ -435,6 +437,20 @@
 
 #pragma mark -
 #pragma mark Reusable Views
+
+-(void)conserveMemory:(NSNotification *)notification {
+	NSArray *reusuableCells = nil;
+	
+	for (id key in [__reusableViews keyEnumerator]) {
+		reusuableCells = [__reusableViews objectForKey:key];
+		
+		for (JOGridViewCell *cell in reusuableCells) {
+			[cell removeFromSuperview];
+		}
+	}
+	
+	[__reusableViews removeAllObjects];
+}
 
 -(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier {
 
