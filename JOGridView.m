@@ -12,12 +12,14 @@
 #define JOGRIDVIEW_DEFAULT_ROW_HEIGHT 44.0
 
 @interface JOGridView (PrivateMethods)
+-(void)enqueueReusableCellsForRow:(NSUInteger)row;
 -(void)enqueueReusableCell:(JOGridViewCell *)cell;
--(NSRange)rangeOfVisibleRows;
--(void)setFirstVisibleRow:(NSUInteger)row;
 
 -(void)purgeCells;
 -(void)buildCells;
+
+-(NSArray *)cellsForLayoutOfRow:(NSUInteger)row atHeight:(CGFloat)height;
+-(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp;
 
 -(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row;
 -(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height;
@@ -183,17 +185,17 @@
 	
 }
 
--(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp {
-	
-	CGFloat rowHeight = [self delegateHeightForRow:row];
-				
+-(NSArray *)cellsForLayoutOfRow:(NSUInteger)row atHeight:(CGFloat)height {
+    
+    CGFloat rowHeight = [self delegateHeightForRow:row];
+    
 	JOGridViewCell *cell = nil;
 	
 	NSMutableArray *rowOfCells = [NSMutableArray arrayWithCapacity:__columns];
 	
 	for (NSUInteger i=0;i<__columns;i++) {
 		cell = [self dataSourceCellAtIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
-
+        
 		[self delegateWillDisplayCell:cell atIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
 		
 		if (!cell.superview) {
@@ -205,6 +207,14 @@
 		
 		[rowOfCells addObject:cell];
 	}
+
+    return rowOfCells;
+    
+}
+
+-(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp {
+	
+    NSArray *rowOfCells = [self cellsForLayoutOfRow:row atHeight:height];
 	
 	if (scrollingUp) {
 		[__visibleRows addObject:rowOfCells];
@@ -246,13 +256,9 @@
 					// decide if we need to warp out a row that's now hidden
 					
 					while (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
-						NSArray *rowToEnqueue = [[__visibleRows lastObject] retain];
+
+                        [self enqueueReusableCellsForRow:__lastWarpedInRow];
 						[__visibleRows removeLastObject];
-						
-						for (JOGridViewCell *cell in rowToEnqueue) {
-							[self enqueueReusableCell:cell];
-						}
-						[rowToEnqueue release];
 						
 						__lastWarpedInRowHeight -= [self delegateHeightForRow:__lastWarpedInRow];
 						__lastWarpedInRow--;
@@ -285,14 +291,8 @@
 					// deal with enqueueing
 					while (([__visibleRows count] > 0) && (self.contentOffset.y >= (__firstWarpedInRowHeight + [self delegateHeightForRow:__firstWarpedInRow]))) {
 						
-						NSArray *rowToEnqueue = [[__visibleRows objectAtIndex:0] retain];
+                        [self enqueueReusableCellsForRow:__firstWarpedInRow];                        
 						[__visibleRows removeObjectAtIndex:0];
-						
-						for (JOGridViewCell *cell in rowToEnqueue) {
-							[self enqueueReusableCell:cell];
-						}
-						
-						[rowToEnqueue release];
 						
 						__firstWarpedInRowHeight += [self delegateHeightForRow:__firstWarpedInRow];
 						__firstWarpedInRow++;
@@ -377,7 +377,7 @@
 
 
 #pragma mark -
-#pragma mark Data
+#pragma mark Reloading stuff
 
 -(void)reloadData {
 
@@ -408,6 +408,21 @@
 
 }
 
+-(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath {
+    if ((indexPath.section >= __firstWarpedInRow) && (indexPath.section <= __lastWarpedInRow)) {
+        
+    }
+    
+}
+
+-(void)reloadRow:(NSUInteger)row {
+    if ((row >= __firstWarpedInRow) && (row <= __lastWarpedInRow)) {
+        [self enqueueReusableCellsForRow:row];
+        [self cellsForLayoutOfRow:row atHeight:[self heightRelativeToOriginForRow:row]];
+    }
+}
+
+
 #pragma mark -
 #pragma mark Reusable Views
 
@@ -424,6 +439,16 @@
 	} else {
 		return nil;
 	}
+}
+
+-(void)enqueueReusableCellsForRow:(NSUInteger)row {
+    if ((row >= __firstWarpedInRow) && (row <= __lastWarpedInRow)) {
+        NSArray *rowToEnqueu = [__visibleRows objectAtIndex:row - __firstWarpedInRow];
+        
+        for (JOGridViewCell *cell in rowToEnqueu) {
+            [self enqueueReusableCell:cell];
+        }        
+    }
 }
 
 -(void)enqueueReusableCell:(JOGridViewCell *)cell {
