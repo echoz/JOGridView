@@ -361,6 +361,21 @@
 	}
 }
 
+#pragma mark - 
+#pragma mark Scrolling to Cells!
+
+-(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated {
+    if (row < __rows) {
+        CGFloat heightForRow = [self heightRelativeToOriginForRow:row];
+        [self scrollRectToVisible:CGRectMake(0, heightForRow, self.frame.size.width, [self delegateHeightForRow:row]) animated:animated];        
+    }
+}
+
+-(void)scrollToIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated {
+    [self scrollToRow:indexPath.section animated:animated];
+}
+
+
 #pragma mark -
 #pragma mark Data
 
