@@ -419,6 +419,8 @@
         JOGridViewCell *cellToRefresh = [cellsForVisibleRow objectAtIndex:indexPath.row];
         
         [self enqueueReusableCell:cellToRefresh];
+		
+		[self cellForlayoutAtIndexPath:indexPath atHeight:[self heightRelativeToOriginForRow:indexPath.row]];
     }
     
 }
