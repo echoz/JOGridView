@@ -35,6 +35,7 @@
 @implementation JOGridView
 @synthesize visibleRows = __visibleRows, allowsSelecton;
 @synthesize datasource = gridViewDataSource, delegate = gridViewDelegate;
+@synthesize numberOfRows = __rows, numberOfColumns = __columns;
 @synthesize debug;
 
 - (id)initWithFrame:(CGRect)frame {

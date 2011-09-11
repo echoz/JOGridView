@@ -66,7 +66,7 @@
 @property (nonatomic, assign) id <JOGridViewDelegate> delegate;
 @property (readwrite) BOOL debug;
 
-// cell accessors
+/// cell accessors
 @property (readonly) NSArray *visibleRows;
 -(NSIndexPath *)indexPathForCell:(JOGridViewCell *)cell;
 -(NSIndexPath *)indexPathsForVisibleCells;
@@ -78,15 +78,15 @@
 -(void)selectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 -(void)deselectCellAtIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
-// scrolling
+/// scrolling
 -(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated;
 -(void)scrollToIndexPath:(NSIndexPath *)indexPath animated:(BOOL)animated;
 
-// gridview properties
--(NSUInteger)numberOfRows;
--(NSUInteger)numberOfColumnsInRow:(NSUInteger)row;
+/// gridview properties
+@property (readonly) NSUInteger numberOfRows;
+@property (readonly) NSUInteger numberOfColumns;
 
-// reload methods
+/// reload methods
 -(JOGridViewCell *)dequeueReusableCellWithIdenitifer:(NSString *)identifier;
 -(void)reloadData;
 -(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath;
