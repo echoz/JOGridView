@@ -20,6 +20,7 @@
 
 -(NSArray *)cellsForLayoutOfRow:(NSUInteger)row atHeight:(CGFloat)height;
 -(void)layoutRow:(NSUInteger)row atHeight:(CGFloat)height scrollingUp:(BOOL)scrollingUp;
+-(JOGridViewCell *)cellForlayoutAtIndexPath:(NSIndexPath *)indexPath atHeight:(CGFloat)height;
 
 -(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row;
 -(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height;
@@ -186,25 +187,13 @@
 }
 
 -(NSArray *)cellsForLayoutOfRow:(NSUInteger)row atHeight:(CGFloat)height {
-    
-    CGFloat rowHeight = [self delegateHeightForRow:row];
-    
+        
 	JOGridViewCell *cell = nil;
 	
 	NSMutableArray *rowOfCells = [NSMutableArray arrayWithCapacity:__columns];
 	
 	for (NSUInteger i=0;i<__columns;i++) {
-		cell = [self dataSourceCellAtIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
-        
-		[self delegateWillDisplayCell:cell atIndexPath:[NSIndexPath indexPathForRow:i inSection:row]];
-		
-		if (!cell.superview) {
-			[self addSubview:cell];			
-		}
-		
-		cell.frame = CGRectMake(i * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, rowHeight);
-		[cell layoutSubviews];
-		
+		cell = [self cellForlayoutAtIndexPath:[NSIndexPath indexPathForRow:i inSection:row] atHeight:height];
 		[rowOfCells addObject:cell];
 	}
 
@@ -221,6 +210,22 @@
 	} else {
 		[__visibleRows insertObject:rowOfCells atIndex:0];
 	}
+}
+
+-(JOGridViewCell *)cellForlayoutAtIndexPath:(NSIndexPath *)indexPath atHeight:(CGFloat)height {
+    JOGridViewCell *cell = [self dataSourceCellAtIndexPath:indexPath];
+    
+    [self delegateWillDisplayCell:cell atIndexPath:indexPath];
+    
+    if (!cell.superview) {
+        [self addSubview:cell];			
+    }
+    
+    cell.frame = CGRectMake(indexPath.row * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, height);
+    [cell layoutSubviews];
+    
+    return cell;
+
 }
 
 -(void)layoutSubviews {
@@ -410,7 +415,10 @@
 
 -(void)reloadCellAtIndexPath:(NSIndexPath *)indexPath {
     if ((indexPath.section >= __firstWarpedInRow) && (indexPath.section <= __lastWarpedInRow)) {
+        NSArray *cellsForVisibleRow = [__visibleRows objectAtIndex:indexPath.section - __firstWarpedInRow];
+        JOGridViewCell *cellToRefresh = [cellsForVisibleRow objectAtIndex:indexPath.row];
         
+        [self enqueueReusableCell:cellToRefresh];
     }
     
 }
