@@ -249,7 +249,15 @@
 		}
 		
 		if (self.debug) {
-			debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", [self.subviews count]];		
+			NSUInteger cellcount = 0;
+			
+			for (id obj in self.subviews) {
+				if ([obj isKindOfClass:[JOGridViewCell class]]) {
+					cellcount++;
+				}
+			}
+			
+			debugInfoLabel.text = [NSString stringWithFormat:@"cells in view: %i", cellcount];
 		}
 		
 		if ([gridViewDataSource conformsToProtocol:@protocol(JOGridViewDataSource)]) {
@@ -293,8 +301,9 @@
 			} else {
 				// scrolling up
 				
+				
 				while ((__lastWarpedInRow < __rows-1) && ((self.contentOffset.y + self.frame.size.height) >= (__lastWarpedInRowHeight + [self delegateHeightForRow:__lastWarpedInRow]))) {
-					
+
 					__lastWarpedInRowHeight += [self delegateHeightForRow:__lastWarpedInRow];
 					__lastWarpedInRow++;
 					
