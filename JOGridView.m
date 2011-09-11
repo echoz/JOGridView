@@ -199,9 +199,7 @@
 	
 	for (NSUInteger i=0;i<__columns;i++) {
 		cell = [self cellForlayoutAtIndexPath:[NSIndexPath indexPathForRow:i inSection:row] atHeight:height];
-		if (cell) {
-			[rowOfCells addObject:cell];			
-		}
+		[rowOfCells addObject:cell];
 	}
 
     return rowOfCells;
