@@ -140,16 +140,19 @@
 			for (NSUInteger q=0;q<__columns;q++) {
 				cell = [self dataSourceCellAtIndexPath:[NSIndexPath indexPathForRow:q inSection:i]];
 				
-				[self delegateWillDisplayCell:cell atIndexPath:[NSIndexPath indexPathForRow:q inSection:i]];
-				
-				[rowArray addObject:cell];
-				
-				if (!cell.superview) {
-					[self addSubview:cell];
+				if (cell) {
+					[self delegateWillDisplayCell:cell atIndexPath:[NSIndexPath indexPathForRow:q inSection:i]];
+					
+					[rowArray addObject:cell];
+					
+					if (!cell.superview) {
+						[self addSubview:cell];
+					}					
+					
+					cell.frame = CGRectMake(-CGFLOAT_MAX, -CGFLOAT_MAX, 0, 0);
+					
 				}
-
 				
-				cell.frame = CGRectMake(-CGFLOAT_MAX, -CGFLOAT_MAX, 0, 0);
 			}
 			
 			[__visibleRows addObject:rowArray];
@@ -220,17 +223,67 @@
 -(JOGridViewCell *)cellForlayoutAtIndexPath:(NSIndexPath *)indexPath atHeight:(CGFloat)height {
     JOGridViewCell *cell = [self dataSourceCellAtIndexPath:indexPath];
     
-    [self delegateWillDisplayCell:cell atIndexPath:indexPath];
-    
-    if (!cell.superview) {
-        [self addSubview:cell];			
-    }
-    
-    cell.frame = CGRectMake(indexPath.row * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, [self delegateHeightForRow:indexPath.row]);
-    [cell layoutSubviews];
+	if (cell) {
+		[self delegateWillDisplayCell:cell atIndexPath:indexPath];
+		
+		if (!cell.superview) {
+			[self addSubview:cell];			
+		}
+		
+		cell.frame = CGRectMake(indexPath.row * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, [self delegateHeightForRow:indexPath.row]);
+		[cell layoutSubviews];
+		
+	}	
     
     return cell;
 
+}
+
+-(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height {
+	
+	// find out the row that the current height represents all the way from the
+	// origin of the content view. if the height is exactly the height of the 
+	// row or less than the height, it is that row
+
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+
+		CGFloat calcheight = 0.0;
+		int row=0;
+		
+		while (calcheight < height) {
+			calcheight += [gridViewDelegate gridView:self heightForRow:row];			
+			row++;
+		}
+					
+		if (calcheight > height) {
+			return row-1;
+		} else {
+			return row;
+		}		
+		
+	} else {
+		
+		return (NSUInteger)(height / JOGRIDVIEW_DEFAULT_ROW_HEIGHT);			
+		
+	}
+}
+
+-(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row {
+	
+	// returns the height for the row accurate to its full height from the 
+	// origin to the end of the row.
+	
+	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
+		CGFloat height = 0.0;
+		
+		for (NSUInteger i=0;i<row;i++) {
+			height += [gridViewDelegate gridView:self heightForRow:i];
+		}
+		
+		return height;
+	} else {
+		return (row * JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
+	}
 }
 
 -(void)layoutSubviews {
@@ -266,7 +319,7 @@
 					// decide if we need to warp out a row that's now hidden
 					
 					while (([__visibleRows count] > 0) && ((self.contentOffset.y + self.frame.size.height) <= __lastWarpedInRowHeight)) {
-
+						
                         [self enqueueReusableCellsForRow:__lastWarpedInRow];
 						[__visibleRows removeLastObject];
 						
@@ -320,59 +373,12 @@
 			}	
 		}	
 	}
-		
+	
 	__previousOffset = self.contentOffset.y;
 }
 
--(NSUInteger)rowForHeightRelativeToOrigin:(CGFloat)height {
-	
-	// find out the row that the current height represents all the way from the
-	// origin of the content view. if the height is exactly the height of the 
-	// row or less than the height, it is that row
-
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-
-		CGFloat calcheight = 0.0;
-		int row=0;
-		
-		while (calcheight < height) {
-			calcheight += [gridViewDelegate gridView:self heightForRow:row];			
-			row++;
-		}
-					
-		if (calcheight > height) {
-			return row-1;
-		} else {
-			return row;
-		}		
-		
-	} else {
-		
-		return (NSUInteger)(height / JOGRIDVIEW_DEFAULT_ROW_HEIGHT);			
-		
-	}
-}
-
--(CGFloat)heightRelativeToOriginForRow:(NSUInteger)row {
-	
-	// returns the height for the row accurate to its full height from the 
-	// origin to the end of the row.
-	
-	if ([gridViewDelegate respondsToSelector:@selector(gridView:heightForRow:)]) {
-		CGFloat height = 0.0;
-		
-		for (NSUInteger i=0;i<row;i++) {
-			height += [gridViewDelegate gridView:self heightForRow:i];
-		}
-		
-		return height;
-	} else {
-		return (row * JOGRIDVIEW_DEFAULT_ROW_HEIGHT);
-	}
-}
-
-#pragma mark - 
-#pragma mark Scrolling to Cells!
+#pragma mark -
+#pragma mark Scrolling to Cells
 
 -(void)scrollToRow:(NSUInteger)row animated:(BOOL)animated {
     if (row < __rows) {
