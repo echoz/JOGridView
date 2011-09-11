@@ -221,7 +221,7 @@
         [self addSubview:cell];			
     }
     
-    cell.frame = CGRectMake(indexPath.row * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, height);
+    cell.frame = CGRectMake(indexPath.row * (self.frame.size.width / __columns), height, self.frame.size.width / __columns, [self delegateHeightForRow:indexPath.row]);
     [cell layoutSubviews];
     
     return cell;
