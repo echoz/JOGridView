@@ -11,7 +11,7 @@
 
 #define JOGRIDVIEW_DEFAULT_ROW_HEIGHT 44.0
 
-@interface JOGridView (PrivateMethods)
+@interface JOGridView (InternalMethods)
 -(void)enqueueReusableCellsForRow:(NSUInteger)row;
 -(void)enqueueReusableCell:(JOGridViewCell *)cell;
 
