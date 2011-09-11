@@ -76,7 +76,10 @@
 }
 
 -(void)dealloc {
+	[debugInfoLabel release], debugInfoLabel = nil;
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[__reusableViews release], __reusableViews = nil;
+	[__visibleRows release], __visibleRows = nil;
 	[super dealloc];
 }
 
