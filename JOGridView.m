@@ -546,15 +546,19 @@
 
 	cell.frame = CGRectMake(-CGFLOAT_MAX, -CGFLOAT_MAX, 0, 0);
 	
-	if ([__reusableViews objectForKey:cell.reuseIdentifier]) {
-		[[__reusableViews objectForKey:cell.reuseIdentifier] addObject:cell];
-
+	if (cell.reuseIdentifier) {
+		if ([__reusableViews objectForKey:cell.reuseIdentifier]) {
+			[[__reusableViews objectForKey:cell.reuseIdentifier] addObject:cell];
+			
+		} else {
+			NSMutableArray *array = [NSMutableArray arrayWithCapacity:0];
+			[array addObject:cell];
+			[__reusableViews setObject:array forKey:cell.reuseIdentifier];
+		}
+		
 	} else {
-		NSMutableArray *array = [NSMutableArray arrayWithCapacity:0];
-		[array addObject:cell];
-		[__reusableViews setObject:array forKey:cell.reuseIdentifier];
+		[cell removeFromSuperview];
 	}
-
 }
 
 
