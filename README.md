@@ -13,6 +13,7 @@ This is a grid view based on the concepts that UITableView set forth to provide.
 - It automatically purges reusable cells when there is a memory constrain
 
 TODO:
+=====
 - clean up first before laying out to conserve on memory
 - consistent delegate/datasource method signatures
 - cellforrowatindexpath in JOGridView (wtf is it really for?)
